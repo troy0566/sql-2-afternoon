@@ -151,3 +151,64 @@ WHERE Type = "silver";
 4)
 DELETE FROM practice_delete 
 WHERE Value = 150;
+__________________________________________________________________
+eCommerce Simulation - No Hints
+
+CREATE TABLE users (
+  user_id SERIAL PRIMARY KEY NOT NULL,
+  name varchar(40),
+  email varchar(40) 
+);
+
+CREATE TABLE products (
+  product_id SERIAL PRIMARY KEY NOT NULL,
+  name varchar(40),
+  price integer
+);
+
+CREATE TABLE orders (
+  order_id SERIAL PRIMARY KEY NOT NULL,
+  product_id integer 
+);
+
+INSERT INTO users (name, email) values ('Fred','FredA@b.com');
+INSERT INTO users (name, email) values ('Tom','TomC@b.com');
+INSERT INTO users (name, email) values ('Jake','JakeD@b.com');
+
+INSERT INTO products (name, price) values ('Wallet',26.00);
+INSERT INTO products (name, price) values ('Keyring',15.00);
+INSERT INTO products (name, price) values ('PhoneCase',20.00);
+
+INSERT INTO orders (product_id) values (1);
+INSERT INTO orders (product_id) values (2);
+INSERT INTO orders (product_id) values (3);
+
+select p.* from products p
+where product_id = (select product_id from orders where order_id = 1);
+
+select * from orders;
+
+select sum(p.price) from products p
+where product_id = (select product_id from orders where order_id = 1);
+
+ALTER TABLE orders
+ADD user_id integer;
+
+ALTER TABLE orders
+ADD FOREIGN KEY (user_id) REFERENCES users(user_id);
+
+update orders set user_id = 2
+where product_id = 1;
+
+update orders set user_id = 3
+where product_id = 2;
+
+update orders set user_id = 1
+where product_id = 3;
+
+select o.* from orders o, users u
+where o.user_id = u.user_id and o.user_id = 1;
+
+select u.user_id, count(o.*) from orders o, users u
+where o.user_id = u.user_id
+group by u.user_id;
